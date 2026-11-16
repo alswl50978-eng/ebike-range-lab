@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "kind": "ebike-public",
+  "updatedAt": null,
+  "title": "배터리가 이만큼 남았다면, 얼마나 더 갈 수 있을까?",
+  "team": "",
+  "checks": [],
+  "notes": [],
+  "rides": [],
+  "report": {"motivation": "", "hypothesis": "", "principles": "", "equipment": "", "design": "", "results": "", "limitations": "", "reflection": ""}
+}

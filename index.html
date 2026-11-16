@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#215342">
+  <meta name="description" content="고등학교 융합동아리의 전기자전거 탐구 노트. 제작 안내부터 주행 가능 거리 추정, 실험 기록과 결과보고서까지.">
+  <title>한 칸 더 — 전기자전거 탐구 노트</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./content.js" defer></script>
+  <script src="./core.js" defer></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 바로가기</a>
+  <aside class="sidebar">
+    <a class="brand" href="#home" aria-label="한 칸 더 홈"><span class="brand-icon">↗</span><span>한 칸 더<small>E-BIKE RESEARCH NOTE</small></span></a>
+    <p class="nav-label">우리의 탐구 공간</p>
+    <nav aria-label="주 메뉴">
+      <a href="#home" data-page="home"><span aria-hidden="true">⌂</span> 프로젝트 홈</a>
+      <a href="#guide" data-page="guide"><span aria-hidden="true">▤</span> 따라 만드는 가이드</a>
+      <a href="#lab" data-page="lab"><span aria-hidden="true">◉</span> 거리 추정 실험실</a>
+      <a href="#journal" data-page="journal"><span aria-hidden="true">✎</span> 나의 탐구 기록</a>
+      <a href="#report" data-page="report"><span aria-hidden="true">▥</span> 결과보고서</a>
+      <a href="#sources" data-page="sources"><span aria-hidden="true">↗</span> 자료와 출처</a>
+    </nav>
+    <div class="sidebar-bottom"><span class="pill soft">고1 융합동아리 프로젝트</span><p>작은 질문에서 시작해,<br>직접 만든 답까지.</p><a href="#storage">백업 · 공개 방법 <span>↗</span></a><a href="https://github.com/alswl50978-eng/ebike-range-lab" target="_blank" rel="noopener">GitHub 저장소 <span>↗</span></a></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><span>탐구 노트 <span class="slash">/</span> <strong id="page-label">프로젝트 홈</strong></span><span id="save-state" role="status">저장소 준비 중</span></header>
+    <main id="main" tabindex="-1"></main>
+    <footer class="footer"><span>한 칸 더 · 생각하고, 만들고, 기록하기</span><a href="#sources">자료 출처와 사진 사용 안내</a></footer>
+  </div>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+  <input id="restore-input" type="file" accept="application/json,.json" hidden>
+  <noscript><p>이 사이트의 계산기와 기록 기능에는 JavaScript가 필요합니다. 제작 안내는 저장소의 README에서도 확인할 수 있습니다.</p></noscript>
+</body>
+</html>
