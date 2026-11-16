@@ -27,3 +27,10 @@ The showcase uses original inline SVG technical diagrams and remotely loaded ill
 The interactive web dashboard now includes **TRIP DISTANCE** in kilometers, formatted to two decimal places (for example, `0.00 km`). Distance accumulates only while **START RIDE** is active, uses the selected speed, updates when the speed slider moves, and stops on **STOP RIDE**. The 60 km full-charge range model remains unchanged. These are browser-generated simulations, not real bicycle measurements.
 
 **ESP32-P4 firmware note:** The GitHub Pages HTML/JavaScript update does not flash the physical board. If its LVGL screen shows `F` instead of decimals, its firmware must format float values into strings (for example, with `dtostrf`) before passing them to `lv_label_set_text`.
+
+## PEDAL 2.2 update — configurable demo and 50 km/h speed (2026-11-16)
+- Web engineering showcase: 0–50 km/h draggable speed setting, blinking RIDING while active, START/STOP, simulated trip distance and predicted remaining range in the ride telemetry panel.
+- Range model assumes 500 Wh / 60 km at full charge and 20 km/h; illustrative factors: ≤15: 1.10, 16–20: 1.00, 21–25: 0.90, 26–35: 0.80, 36–40: 0.70, 41–50: 0.60. Values are not measured results.
+- Custom DEMO editor supports 1–5 independent events; each specifies event time in seconds (1–300) and affected sensor zone (REAR, FRONT, HANDLE, CENTER, HELMET).
+- Default events: 10s FRONT, 25s CENTER, 40s HELMET. Alerts highlight the corresponding bike diagram marker and show a five-second warning banner. Sequence can be stopped or restarted.
+- **Firmware note:** This website is a browser presentation matching the latest proposed ESP32-P4 UI concept; it does not automatically update Arduino firmware or prove that the exact new firmware was compiled on hardware.
