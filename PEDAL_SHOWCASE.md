@@ -22,3 +22,8 @@ The website deliberately labels simulated values, third-party illustrative photo
 
 ## Assets
 The showcase uses original inline SVG technical diagrams and remotely loaded illustrative photos from Unsplash. Photos are not images of this project's hardware.
+
+## Final dashboard update (2026-11-16)
+The interactive web dashboard now includes **TRIP DISTANCE** in kilometers, formatted to two decimal places (for example, `0.00 km`). Distance accumulates only while **START RIDE** is active, uses the selected speed, updates when the speed slider moves, and stops on **STOP RIDE**. The 60 km full-charge range model remains unchanged. These are browser-generated simulations, not real bicycle measurements.
+
+**ESP32-P4 firmware note:** The GitHub Pages HTML/JavaScript update does not flash the physical board. If its LVGL screen shows `F` instead of decimals, its firmware must format float values into strings (for example, with `dtostrf`) before passing them to `lv_label_set_text`.
