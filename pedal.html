@@ -76,7 +76,7 @@ function renderEvents(){
   timeWrap.appendChild(time);
   const zoneWrap=document.createElement('label');zoneWrap.textContent='문제 발생 위치';
   const sel=document.createElement('select');sel.disabled=demoRunning;
-  zoneNames.forEach((n,j)=>{const opt=document.createElement('option');opt.textContent=n+ 충격';opt.value=j;sel.appendChild(opt)});
+  zoneNames.forEach((n,j)=>{const opt=document.createElement('option');opt.textContent=n+' 충격';opt.value=j;sel.appendChild(opt)});
   sel.value=ev.zone;sel.addEventListener('change',()=>{ev.zone=Number(sel.value)});
   zoneWrap.appendChild(sel);row.append(title,timeWrap,zoneWrap);container.appendChild(row);
  });
