@@ -1,36 +1,143 @@
-# PEDAL 2.0 — Intelligent Mobility Engineering Showcase
+# PEDAL 2.2 — 배터리 잔량 기반 주행거리 추정 및 스마트 안전 시스템
 
-**[Open the PEDAL 2.0 visual showcase](https://alswl50978-eng.github.io/ebike-range-lab/pedal.html)**
+- [발표용 인터랙티브 웹페이지](https://alswl50978-eng.github.io/ebike-range-lab/pedal.html)
+- [원본 탐구 기록](https://alswl50978-eng.github.io/ebike-range-lab/)
+- 발표 대상: 고등학교 1학년 프로젝트 / 대학 과제 발표회
+- 권장 발표 시간: 약 8분(시연과 화면 전환 포함), 최대 10분
 
-A standalone GitHub Pages presentation for the ESP32-P4/LVGL electric-bicycle dashboard concept. The existing **한 칸 더** research notebook remains available at the repository root.
+## 1. 연구 목표
 
-## Implementation status
-- **Confirmed component tests:** ESP32-P4 display and touch; one MPU6050 on Arduino UNO with threshold-based acceleration/tilt/impact logic.
-- **Interactive prototype:** Five-zone impact visualization (rear, front, handle, center, helmet), speed slider, start/stop, battery/range display and simulated warnings.
-- **Planned hardware:** Three MPU6050 sensors for rear/front/center; handle and helmet remain virtual. No integrated multi-sensor telemetry or real road test.
-- **Battery model:** Assumed 500 Wh battery, 60 km at full charge and 20 km/h; illustrative speed factors 1.10/1.00/0.90/0.80. No fitted AI prediction model.
+**문제 A — 배터리:** 잔량(%)만으로는 남은 주행 가능 거리(km)를 직관적으로 알기 어렵다. 배터리 전원선에 직접 센서를 연결하여 전압/전류를 측정하려는 초기 구상은 잘못된 배선에 따른 단락·발열·손상 위험이 있어 시연 단계에서 제외했다.
 
-## Evidence policy
-The website deliberately labels simulated values, third-party illustrative photos and unverified functionality. Do not describe modeled values as actual measurements.
+**대안 — 간접 추정:** 출발 시 잔량을 수동 입력하고, 계획 중인 페달 회전 센서(RPM), 바퀴 회전 센서(RPM/속도/거리), 모터 보조 단계 등의 정보를 조합한다. 현재 웹에서는 가상 값으로 계산 구조만 체험한다. **페달 RPM만으로 실제 배터리 잔량을 알 수 없다.** 계산 계수는 실제 주행 및 배터리 계기판 값과 비교하여 보정해야 한다.
 
-## 5-minute booth presentation
-1. **0:00–0:45** — Problem: e-bike safety information is fragmented.
-2. **0:45–1:45** — Architecture: ESP32-P4 + LVGL; five proposed sensing locations.
-3. **1:45–3:00** — Live interaction: speed slider, START/STOP, per-zone alerts.
-4. **3:00–4:00** — Battery: 500 Wh/60 km assumption; 85% and 20 km/h predicts 51.0 km.
-5. **4:00–5:00** — Evidence and next steps: display/touch and single-MPU6050 tests completed; multi-sensor wiring, road measurements and AI model validation remain future work.
+**문제 B — 안전:** 충격을 받았을 때 위치를 알기 어렵다. 앞바퀴·뒷바퀴·핸들·차체 중심·헬멧 등 5개 위치의 위험 상태를 표시하는 화면을 개발하고, 발생 시간과 위치를 설정해 가상 사고를 재현한다.
 
-## Assets
-The showcase uses original inline SVG technical diagrams and remotely loaded illustrative photos from Unsplash. Photos are not images of this project's hardware.
+## 2. 실제 확인한 사항 / 시뮬레이션 / 향후 계획
 
-## Final dashboard update (2026-11-16)
-The interactive web dashboard now includes **TRIP DISTANCE** in kilometers, formatted to two decimal places (for example, `0.00 km`). Distance accumulates only while **START RIDE** is active, uses the selected speed, updates when the speed slider moves, and stops on **STOP RIDE**. The 60 km full-charge range model remains unchanged. These are browser-generated simulations, not real bicycle measurements.
+| 분류 | 내용 |
+|---|---|
+| 실제 작동 확인 | ESP32-P4 LCD 화면 출력 및 터치 조작 |
+| 실제 작동 확인 | Arduino UNO에서 MPU6050 단일 센서 가속도/기울기/충격 임계값 동작 |
+| 실제 구현·시연 | LVGL 주행 계기판; 웹에서 속도·주행거리·5구역 경고·시간 예약 데모 |
+| 발표용 가상 값 | 배터리 잔량, 예상 거리, 5개 구역 경고 및 이벤트, 회전 센서 입력 |
+| 아직 미구현 | MPU6050 3개 동시 연결 및 ESP32-P4 데이터 통신, 실제 페달·바퀴 회전수 취득, 도로 주행 및 전력 검증 |
+| 배터리 기준 | 500Wh 용량과 완충 시 60km는 설명용 가정, 측정 결과나 시장 전체 평균 아님 |
 
-**ESP32-P4 firmware note:** The GitHub Pages HTML/JavaScript update does not flash the physical board. If its LVGL screen shows `F` instead of decimals, its firmware must format float values into strings (for example, with `dtostrf`) before passing them to `lv_label_set_text`.
+## 3. 데이터 모델과 기술 한계
 
-## PEDAL 2.2 update — configurable demo and 50 km/h speed (2026-11-16)
-- Web engineering showcase: 0–50 km/h draggable speed setting, blinking RIDING while active, START/STOP, simulated trip distance and predicted remaining range in the ride telemetry panel.
-- Range model assumes 500 Wh / 60 km at full charge and 20 km/h; illustrative factors: ≤15: 1.10, 16–20: 1.00, 21–25: 0.90, 26–35: 0.80, 36–40: 0.70, 41–50: 0.60. Values are not measured results.
-- Custom DEMO editor supports 1–5 independent events; each specifies event time in seconds (1–300) and affected sensor zone (REAR, FRONT, HANDLE, CENTER, HELMET).
-- Default events: 10s FRONT, 25s CENTER, 40s HELMET. Alerts highlight the corresponding bike diagram marker and show a five-second warning banner. Sequence can be stopped or restarted.
-- **Firmware note:** This website is a browser presentation matching the latest proposed ESP32-P4 UI concept; it does not automatically update Arduino firmware or prove that the exact new firmware was compiled on hardware.
+- 기존 단순 계산: `예상 거리 = 60km × (배터리 잔량 ÷ 100) × 속도 보정 계수`
+- 제안하는 간접 추정: `바퀴 회전수 × 바퀴 둘레 → 주행거리`, `초기 잔량 − (이동거리 / 가정 완충거리) × 100 → 추정 잔량`
+- 앞으로 실측할 항목: 출발 배터리 계기판 잔량, 종료 잔량, 바퀴 회전수, 페달 케이던스, 주행 거리, 속도, 보조 단계, 주행 환경
+- 한계: 페달 회전만으로 모터 전력 소모량이 결정되지 않는다. 바람, 경사, 모터 제어, 페달 노력과 탑승자 무게에 따라 오차가 발생한다. 모터가 꺼진 경우 거리와 배터리 소비의 관계도 달라진다.
+- 안전 원칙: 학생 프로젝트에서는 배터리 고전압부 개조나 직접 배선 실험을 진행하지 않는다. 향후 제조사에서 지원하는 계기판 데이터 또는 인증된 절연 측정 장치를 전문가 감독 아래 검토할 수 있다.
+
+---
+
+# 8분 발표 대본 — 고1 학생용
+
+### 1. 주제 소개 (50초) — 웹 첫 화면
+
+안녕하세요. 저희는 **배터리 잔량에 따른 주행 가능 거리 계산과 스마트 안전 시스템**을 주제로 PEDAL 프로젝트를 진행했습니다.
+
+전기자전거를 타면 배터리가 몇 퍼센트 남았는지는 볼 수 있지만, 앞으로 얼마나 더 갈 수 있을지는 쉽게 알기 어렵습니다. 또 자전거가 큰 충격을 받았을 때 어느 부분에 문제가 생겼는지 바로 확인하기도 어렵습니다.
+
+저희는 이 두 가지 문제를 해결하기 위해 첫째, 남은 주행거리를 예측하는 프로그램, 둘째, 충격 발생 위치를 알려주는 안전 시스템을 구상했습니다.
+
+### 2. 배터리 거리 계산 원리 (1분) — 주행 계기판
+
+우선 배터리 예측부터 설명하겠습니다. 배터리가 85% 남았을 때 실제로 몇 km를 더 탈 수 있을까요?
+
+현재 프로그램에서는 500Wh 배터리와 완충 시 60km를 **가정**했습니다. 속도를 시속 20km로 설정하면 배터리 85%에서 약 51km를 계산합니다.
+
+속도가 높아지면 모터가 더 많은 에너지를 사용할 수 있으므로, 설명용 속도 보정값을 넣어 예상 거리가 줄어들게 만들었습니다. 하지만 지금 화면의 배터리 소비량은 실제 측정값이 아니라 가상 계산 결과입니다.
+
+### 3. 개발 중 발견한 기술적 문제 (1분 20초) — 배터리 측정 방식 개선
+
+여기서 중요한 문제를 발견했습니다.
+
+처음에는 배터리에 센서를 직접 연결해 전압과 전류를 측정하는 방법을 생각했습니다. 그런데 배터리의 전원선에 잘못 연결하면 단락이나 발열, 장치 손상 위험이 있습니다.
+
+그래서 무리하게 배터리에 연결하기보다는 **간접적으로 주행 정보를 측정하는 방식**으로 방향을 바꾸었습니다.
+
+페달에 센서를 달아 분당 회전수, 즉 RPM을 측정하고, 바퀴에도 센서를 달아 실제 속도와 이동거리를 알아내는 방법입니다. 그리고 출발할 때 배터리 계기판의 잔량을 입력하고, 모터 보조 단계도 기록하는 것입니다.
+
+다만 페달을 빠르게 돌린다고 반드시 배터리가 많이 소모되는 것은 아닙니다. 모터를 얼마나 보조받았는지에 따라 달라지기 때문에, 페달 회전수만으로 정확한 배터리 잔량을 알 수는 없습니다.
+
+**저희는 이 방법을 실측 완료 기술이 아닌, 안전을 고려한 다음 개발 방향으로 제안합니다.**
+
+### 4. 웹에서 새로운 계산 방식 시연 (55초) — 배터리 측정 방식 개선
+
+지금 보시는 웹 화면이 새롭게 구상한 계산 방법입니다.
+
+출발 배터리 잔량을 입력하고, 페달 회전수와 바퀴 속도, 모터 보조 단계를 설정할 수 있습니다.
+
+[잔량 85%, 페달 65RPM, 속도 20km/h 설정]
+
+여기서는 가상으로 10km를 주행했다고 가정해 예상 남은 잔량과 거리를 계산합니다. 페달 RPM은 아직 데이터 수집 계획을 설명하기 위한 값이며, 직접 배터리 소모량을 결정하도록 만들지는 않았습니다.
+
+앞으로 실제 센서를 설치하고 전기자전거 계기판 수치와 비교한다면 오차를 줄일 수 있을 것입니다.
+
+### 5. 스마트 안전 시스템과 하드웨어 (1분 10초) — 기술 구조
+
+두 번째 기능은 스마트 안전 시스템입니다.
+
+저희는 충격 감지 위치를 앞바퀴, 뒷바퀴, 핸들, 차체 중심, 헬멧까지 다섯 곳으로 나누었습니다. 이를 통해 단순히 충격이 있었다는 사실뿐 아니라 **어디에서 충격이 발생했는지** 보여주고자 했습니다.
+
+이를 위해 MPU6050 센서를 사용했습니다. 가속도와 회전 움직임을 읽을 수 있는 센서입니다. 저희는 아두이노 UNO와 센서 한 개를 연결해 충격과 기울기 감지 코드를 시험했습니다.
+
+현재 MPU6050은 3개를 보유하고 있지만, 다섯 개 부위를 모두 실제로 연결한 상태는 아닙니다. 발표 화면에서는 다섯 개 구역을 시뮬레이션으로 표시하고 있습니다.
+
+### 6. 시행착오와 프로그램 제작 (1분) — 개발 과정
+
+화면 제작에도 여러 어려움이 있었습니다.
+
+ESP32-P4 보드에 화면을 출력하고 터치 기능을 작동시키기 위해 라이브러리와 보드 설정을 맞춰야 했습니다. 또 주행거리의 소수점이 정상적으로 나오지 않고 알파벳 F로 표시되는 문제가 있었습니다.
+
+이 문제를 수정하면서 숫자를 화면에 출력할 때 데이터 형식이 중요하다는 것을 알게 되었습니다.
+
+센서를 여러 개 연결할 경우에는 같은 통신 주소를 사용하는 문제도 조사했습니다. 결국 모든 기능을 서둘러 연결하기보다는, 우선 작동하는 디스플레이와 센서 개별 시험을 확보하고 나머지를 가상 시연으로 설명하기로 했습니다.
+
+### 7. 주행 및 위험 시나리오 시연 (1분 20초) — 시연 화면과 데모
+
+이제 프로그램을 시연하겠습니다.
+
+[주행 속도 슬라이더를 20km/h로 조절하고 주행 시작 클릭]
+
+주행 시작 버튼을 누르면 주행 중 표시가 깜빡이고 이동거리가 증가합니다. 속도를 바꾸면 예상 주행 가능 거리도 달라집니다.
+
+[주행 정지 후 데모로 이동]
+
+데모에서는 이벤트마다 **발생 시간과 문제 위치를 따로 설정**할 수 있습니다. 첫 번째 이벤트는 10초 후 앞바퀴 충격, 두 번째는 25초 후 차체 중심 충격, 세 번째는 40초 후 헬멧 충격으로 설정하겠습니다.
+
+[데모 시작, 첫 번째 경고 확인]
+
+설정한 시간이 되면 해당 위치가 빨간색으로 바뀌면서 경고가 나타납니다. 실제 충격 센서가 연결된 것처럼 데이터를 속여 보여주는 것이 아니라, 앞으로 만들 안전 기능의 작동 원리를 미리 시각화한 것입니다.
+
+### 8. 결과 및 마무리 (45초) — 검증 현황
+
+이번 프로젝트를 통해 배터리 주행거리 계산 기능과 충격 위치 경고 화면을 만들었습니다. 실제로 ESP32-P4의 화면과 터치, MPU6050 한 개의 충격·기울기 감지 코드를 시험했습니다.
+
+특히 배터리 직접 연결 방식의 위험을 발견하고, 페달과 바퀴의 회전 데이터를 활용하는 **더 안전한 간접 추정 방향**으로 설계를 개선했다는 점이 의미 있다고 생각합니다.
+
+앞으로는 실제 주행 기록을 수집해 거리 예측 오차를 확인하고, 센서들을 하나의 시스템으로 연결해 보고 싶습니다.
+
+저희가 만들고 싶은 것은 단순히 달리는 전기자전거가 아니라, **남은 거리를 예상하고 위험을 알려주는 더 똑똑한 자전거**입니다.
+
+발표를 마치겠습니다. 감사합니다.
+
+## 발표 시연 순서 / 시간표
+
+| 순서 | 화면 | 소요 |
+|---|---|---:|
+| 1 | 프로젝트 소개 | 50초 |
+| 2 | 기존 배터리 거리 계산 | 1분 |
+| 3 | 안전상 기술 문제와 대안 | 1분 20초 |
+| 4 | 간접 추정 시뮬레이션 | 55초 |
+| 5 | 스마트 안전 시스템 | 1분 10초 |
+| 6 | 시행착오 | 1분 |
+| 7 | 주행 및 충격 경고 시연 | 1분 20초 |
+| 8 | 결과 및 향후 계획 | 45초 |
+| **합계** | | **8분 20초** |
+
+> **주의:** 배터리·RPM·주행 거리와 다섯 구역 충격은 현 단계에서 발표용 시뮬레이션 수치입니다. 실제로 검증된 것처럼 발표하지 않습니다. 이는 안전 성능이 인증된 장치가 아닙니다.
